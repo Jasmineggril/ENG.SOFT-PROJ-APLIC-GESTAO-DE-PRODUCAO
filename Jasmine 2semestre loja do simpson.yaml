@@ -1,0 +1,212 @@
+openapi: 3.0.0
+info:
+  title: Loja de Roupas dos Simpsons
+  description: |
+    # Loja de Roupas dos Simpsons
+    Uma API para gerenciar clientes, produtos e pedidos em uma loja de roupas temática dos Simpsons, inspirada em funcionalidades de e-commerces reais, como as Lojas Renner.
+
+    ## Endpoints Disponíveis
+    - **GET /clientes/{id}**: Retorna os detalhes de um cliente.
+    - **POST /clientes**: Cadastra um novo cliente.
+    - **GET /produtos**: Retorna a lista de produtos temáticos dos Simpsons.
+    - **POST /produtos**: Cadastra um novo produto.
+    - **GET /clientes/{id}/pedidos**: Retorna os pedidos de um cliente.
+    - **POST /pedidos**: Cria um novo pedido.
+
+    Divirta-se explorando a loja dos Simpsons! 🎉
+  version: 1.0.0
+paths:
+  /clientes/{id}:
+    get:
+      summary: Consulta um cliente
+      description: Retorna os detalhes de um cliente com base no ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Cliente retornado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cliente'
+              example:
+                id: 1
+                nome: "Homer Simpson"
+                email: "homer@example.com"
+        '404':
+          description: Cliente não encontrado
+  /clientes:
+    post:
+      summary: Cadastra um novo cliente
+      description: Adiciona um novo cliente ao sistema.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Cliente'
+            example:
+              nome: "Marge Simpson"
+              email: "marge@example.com"
+      responses:
+        '201':
+          description: Cliente cadastrado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cliente'
+  /produtos:
+    get:
+      summary: Lista todos os produtos
+      description: Retorna a lista de produtos temáticos dos Simpsons.
+      responses:
+        '200':
+          description: Lista de produtos retornada com sucesso
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Produto'
+              example:
+                - id: 1
+                  nome: "Camiseta do Homer"
+                  preco: 49.99
+                  tamanho: "G"
+                - id: 2
+                  nome: "Vestido da Marge"
+                  preco: 99.99
+                  tamanho: "M"
+    post:
+      summary: Cadastra um novo produto
+      description: Adiciona um novo produto ao catálogo.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Produto'
+            example:
+              nome: "Moletom do Bart"
+              preco: 129.99
+              tamanho: "P"
+      responses:
+        '201':
+          description: Produto cadastrado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Produto'
+  /clientes/{id}/pedidos:
+    get:
+      summary: Consulta os pedidos de um cliente
+      description: Retorna a lista de pedidos de um cliente específico.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lista de pedidos retornada com sucesso
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Pedido'
+              example:
+                - id: 1
+                  clienteId: 1
+                  produtos:
+                    - id: 1
+                      nome: "Camiseta do Homer"
+                      preco: 49.99
+                      tamanho: "G"
+                  total: 49.99
+  /pedidos:
+    post:
+      summary: Cria um novo pedido
+      description: Adiciona um novo pedido ao sistema.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Pedido'
+            example:
+              clienteId: 1
+              produtos:
+                - id: 1
+                  quantidade: 2
+              total: 99.98
+      responses:
+        '201':
+          description: Pedido criado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pedido'
+components:
+  schemas:
+    Cliente:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID único do cliente.
+        nome:
+          type: string
+          description: Nome do cliente.
+        email:
+          type: string
+          description: E-mail do cliente.
+      required:
+        - nome
+        - email
+    Produto:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID único do produto.
+        nome:
+          type: string
+          description: Nome do produto.
+        preco:
+          type: number
+          description: Preço do produto.
+        tamanho:
+          type: string
+          description: Tamanho do produto (PP, P, M, G, GG).
+          enum: [PP, P, M, G, GG]
+      required:
+        - nome
+        - preco
+        - tamanho
+    Pedido:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID único do pedido.
+        clienteId:
+          type: integer
+          description: ID do cliente que fez o pedido.
+        produtos:
+          type: array
+          items:
+            $ref: '#/components/schemas/Produto'
+          description: Lista de produtos no pedido.
+        total:
+          type: number
+          description: Valor total do pedido.
+      required:
+        - clienteId
+        - produtos
+        - total
